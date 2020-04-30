@@ -145,7 +145,19 @@ export function readTraceFromEvent(event: any): TraceContext | undefined {
   if (typeof event !== "object") {
     return;
   }
-  const headers = event.headers;
+
+  const records = event.Records;
+  if (!Array.isArray(records) || records.length === 0) {
+    return;
+  }
+
+  let headers;
+  try {
+    const data = JSON.parse(records[0].body);
+    headers = data.MessageHeaders;
+  } catch (e) {
+    return;
+  }
 
   if (typeof headers !== "object") {
     return;
